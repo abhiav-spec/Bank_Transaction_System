@@ -21,8 +21,12 @@
   "homepage": "https://github.com/abhiav-spec/Bank_Transaction_System#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cookieparser": "^0.1.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongoose": "^9.3.0"
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.0",
+    "nodemailer": "^8.0.2"
   }
 }

@@ -22,21 +22,24 @@ password: {
     required: [true, "Password is required"],
     minlength: [6, "Password must be at least 6 characters long"],
     select: false
-}
+},
+systemUser: {
+    type: Boolean,
+    default: false,
+    immutable: true,
+    select: false
 
+},
 },{
     timestamps: true
 });
 
-userSchema.pre('save', async function(next) {
-    if(!this.isModified('password')) {
-        return next();
+userSchema.pre('save', async function() {
+    if (!this.isModified('password')) {
+        return;
     }
 
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
-
-    next();
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 userSchema.methods.comparePassword = async function(candidatePassword) {
