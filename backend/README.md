@@ -63,7 +63,8 @@ The project follows a modular structure using controllers, models, services, rou
 ## Project Structure
 
 ```bash
-.
+
+backend
 ├── package.json
 ├── server.js
 ├── run_full_flow.sh
