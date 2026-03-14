@@ -186,4 +186,66 @@ async function getAccountBalanceController(req, res) {
     }
 }
 
-module.exports = { createAccountDetailsController, getAccountsController, getAccountBalanceController };
+async function getAllAccountsForSystemController(req, res) {
+    try {
+        const accounts = await accountModel.find({}).populate('user', 'name email');
+
+        return res.status(200).json({
+            message: "All accounts fetched successfully",
+            status: true,
+            data: accounts,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Internal server error",
+            status: false,
+        });
+    }
+}
+
+async function updateAccountStatusForSystemController(req, res) {
+    try {
+        const { accountId } = req.params;
+        const { status } = req.body;
+
+        const allowedStatuses = ['active', 'Freeze', 'suspended'];
+
+        if (!status || !allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                message: "status must be one of: active, Freeze, suspended",
+                status: false,
+            });
+        }
+
+        const account = await accountModel.findById(accountId);
+
+        if (!account) {
+            return res.status(404).json({
+                message: "Account not found",
+                status: false,
+            });
+        }
+
+        account.status = status;
+        await account.save();
+
+        return res.status(200).json({
+            message: "Account status updated successfully",
+            status: true,
+            data: account,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Internal server error",
+            status: false,
+        });
+    }
+}
+
+module.exports = {
+    createAccountDetailsController,
+    getAccountsController,
+    getAccountBalanceController,
+    getAllAccountsForSystemController,
+    updateAccountStatusForSystemController,
+};

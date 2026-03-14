@@ -1,0 +1,10 @@
+export { default as RegisterPage } from './Register';
+export { default as LoginPage } from './Login';
+export { default as ForgotPasswordPage } from './ForgotPassword';
+export { default as ResetPasswordPage } from './ResetPassword';
+export { default as DashboardPage } from './Dashboard';
+export { default as TransferPage } from './Transfer';
+export { default as AccountsPage } from './Accounts';
+export { default as TransactionsPage } from './Transactions';
+export { default as ProfilePage } from './Profile';
+export { default as AdminDashboardPage } from './AdminDashboard';
