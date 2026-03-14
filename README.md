@@ -228,4 +228,3 @@ Set `FRONTEND_URL=http://localhost:5173` in `backend/.env` and restart backend.
 - Backend detailed docs: `backend/README.md`
 - Frontend docs/template: `frontend/README.md`
 
-This root README is intentionally separate and does **not** modify backend/frontend README files.

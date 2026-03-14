@@ -503,5 +503,4 @@ npm run dev
 ## Notes
 
 - Current transfer controller introduces a deliberate 5-second wait before credit entry (simulated delay).
-- `run_full_flow.sh` exists for manual flow testing, but ensure it matches latest auth restrictions before using in production checks.
 - This README documents backend APIs only (no UI layer).
