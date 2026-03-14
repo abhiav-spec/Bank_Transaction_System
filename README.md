@@ -9,7 +9,7 @@ A secure Node.js + Express + MongoDB backend for user authentication, account ma
 The **Bank Transaction System** is designed as a backend API for basic digital banking operations:
 
 - User registration, login, logout
-- Account creation and account balance tracking
+- 4-step KYC-based account creation and account balance tracking
 - User-to-user fund transfer (with idempotency support)
 - UPI-style transaction password (PIN) required for fund transfer
 - System user controlled initial deposit flow
@@ -27,6 +27,7 @@ The project follows a modular structure using controllers, models, services, rou
 - [Project Structure](#project-structure)
 - [How the System Works](#how-the-system-works)
   - [Auth Flow](#auth-flow)
+  - [KYC Account Creation Flow](#kyc-account-creation-flow)
   - [Account Flow](#account-flow)
   - [Transaction Flow](#transaction-flow)
   - [System Initial Funds Flow](#system-initial-funds-flow)
@@ -114,9 +115,32 @@ The project follows a modular structure using controllers, models, services, rou
 4. Every fund transfer requires valid `transactionPassword`.
 5. Transfer fails if transaction password is missing/wrong or not set.
 
+### KYC Account Creation Flow
+
+Account creation is separate from user registration and follows a 4-step structure:
+
+1. **Personal Details**
+  - `fullName`
+  - `email`
+  - `nationality`
+2. **Identity Details**
+  - `aadhaarNumber` (must be exactly 12 numeric digits)
+3. **Account Details**
+  - `currency` (default `INR`)
+  - `accountType` (`savings` or `current`)
+4. **Confirmation**
+  - `isConfirmed: true` required before account creation
+
+Validation and business rules:
+
+- Aadhaar format must be valid (`^\\d{12}$`)
+- Maximum 3 accounts are allowed per Aadhaar number
+- Duplicate rapid submissions are prevented
+- Account is always linked to authenticated user
+
 ### Account Flow
 
-1. Authenticated user creates an account with a currency code (e.g. `INR`).
+1. Authenticated user creates account using the 4-step KYC payload.
 2. Account status defaults to `active`.
 3. Balance is calculated from ledger entries:
    - `balance = total credits - total debits`
@@ -318,15 +342,37 @@ Get all accounts for logged-in user.
 
 #### `POST /api/accounts`
 
-Create account for logged-in user.
+Create account for logged-in user using 4-step KYC payload.
 
 **Body**
 
 ```json
 {
-  "currency": "INR"
+  "personalDetails": {
+    "fullName": "John Doe",
+    "email": "john@example.com",
+    "nationality": "Indian"
+  },
+  "identityDetails": {
+    "aadhaarNumber": "123456789012"
+  },
+  "accountDetails": {
+    "currency": "INR",
+    "accountType": "savings"
+  },
+  "confirmation": {
+    "isConfirmed": true
+  }
 }
 ```
+
+**Rules**
+
+- Aadhaar must be exactly 12 digits and numeric only
+- Maximum 3 accounts allowed per Aadhaar number
+- `accountType` must be `savings` or `current`
+- `currency` defaults to `INR` when not provided
+- Request requires authentication token
 
 ---
 
@@ -431,6 +477,9 @@ npm run dev
 - Transaction password (PIN) stored as bcrypt hash
 - Transaction password required for user-to-user transfers
 - Sender account ownership check on transfers
+- 4-step KYC validation before account creation
+- Aadhaar format enforcement (12-digit numeric)
+- Aadhaar account limit enforcement (max 3 accounts)
 - System-user restricted initial funding endpoint
 - Idempotency key for transactions
 - MongoDB transactions for ledger consistency

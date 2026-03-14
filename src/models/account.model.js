@@ -17,13 +17,49 @@ const accountSchema = new mongoose.Schema({
         },
         default: 'active',
     },
+    fullName: {
+        type: String,
+        required: [true, "Full name is required"],
+        trim: true,
+        minlength: [2, "Full name must be at least 2 characters"],
+    },
+    email: {
+        type: String,
+        required: [true, "Email is required"],
+        trim: true,
+        lowercase: true,
+        match: [/^.+@(?:[\w-]+\.)+\w+$/, "Please enter a valid email address"],
+    },
+    nationality: {
+        type: String,
+        required: [true, "Nationality is required"],
+        trim: true,
+    },
+    aadhaarNumber: {
+        type: String,
+        required: [true, "Aadhaar number is required"],
+        trim: true,
+        match: [/^\d{12}$/, "Aadhaar number must be exactly 12 digits"],
+        index: true,
+    },
 
     currency:{
         type: String,
         required: [true, "Currency is required"],
+        default: 'INR',
         trim: true,
          match: [/^[A-Z]{3}$/, "Currency must be a 3-letter ISO code"]
-     },
+    },
+    accountType: {
+        type: String,
+        required: [true, "Account type is required"],
+        enum: {
+            values: ['savings', 'current'],
+            message: "Account type must be either savings or current",
+        },
+        trim: true,
+        lowercase: true,
+    },
 
     
 },{
@@ -31,6 +67,7 @@ const accountSchema = new mongoose.Schema({
 });
 
 accountSchema.index({ user: 1 , status: 1});
+accountSchema.index({ user: 1, aadhaarNumber: 1, accountType: 1, currency: 1 });
 
 accountSchema.methods.getBalance = async function() {
     const credits = await ledgermodel.aggregate([
