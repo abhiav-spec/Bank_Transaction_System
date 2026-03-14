@@ -14,15 +14,25 @@ async function createInitialFundsController(req, res) {
         });
     }
 
+    if (Number(amount) <= 0) {
+        return res.status(400).json({
+            message: "Amount must be greater than 0",
+            status: false,
+        });
+    }
+
     const session = await mongoose.startSession();
 
     try {
         const targetAccount = await accountModel.findById(toAccount);
-        const systemAccount = await accountModel.findById(fromAccount);
+        const systemAccount = await accountModel.findOne({
+            _id: fromAccount,
+            user: req.user._id,
+        });
 
         if (!targetAccount || !systemAccount) {
             return res.status(404).json({
-                message: "From or to account not found",
+                message: "System account or target account not found",
                 status: false,
             });
         }

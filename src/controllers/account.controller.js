@@ -56,4 +56,32 @@ async function getAccountsController(req, res) {
     }
 }
 
-module.exports = { createAccountDetailsController, getAccountsController };
+async function getAccountBalanceController(req, res) {
+    const accountId = req.params.accountId;
+    try {
+        const userId = req.user._id;
+        const account = await accountModel.findOne({ _id: accountId, user: userId });
+
+        if (!account) {
+            return res.status(404).json({
+                message: "Account not found",
+                status: false,
+            });
+        }
+
+        const balance = await account.getBalance();
+        
+        return res.status(200).json({
+            message: "Account balance fetched successfully",
+            status: true,
+            data: { balance: balance }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Internal server error",
+            status: false,
+        });
+    }
+}
+
+module.exports = { createAccountDetailsController, getAccountsController, getAccountBalanceController };

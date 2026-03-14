@@ -53,30 +53,41 @@ async function createTransactionController(req, res) {
 
         session.startTransaction();
 
-        const transaction = await transactionModel.create([{
+        const transaction = (await transactionModel.create([{
             fromAccount,
             toAccount,
             amount,
             idempotencyKey,
             status: 'pending'
-        }], { session });
+        }], { session }))[0];
+
+        await transaction.save({ session });
 
         await ledgerModel.create([{
             account: fromAccount,
             type: 'debit',
             amount,
-            transaction: transaction[0]._id
+            transaction: transaction._id
         }], { session });
+
+        await (()=>{
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve();
+                }, 5000);
+            });
+        })();   
 
         await ledgerModel.create([{
             account: toAccount,
             type: 'credit',
             amount,
-            transaction: transaction[0]._id
+            transaction: transaction._id
         }], { session });
 
-        transaction[0].status = 'completed';
-        await transaction[0].save({ session });
+        await transactionModel.findByIdAndUpdate(transaction._id,
+             { status: 'completed' }, 
+             { session });
 
         await session.commitTransaction();
 
@@ -98,7 +109,7 @@ async function createTransactionController(req, res) {
         return res.status(201).json({
             message: "Transaction created successfully",
             status: true,
-            transaction: transaction[0]
+            transaction: transaction
         });
     } catch (error) {
         if (session.inTransaction()) {

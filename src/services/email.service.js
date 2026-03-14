@@ -71,4 +71,12 @@ async function sendReversalEmail(to, name, amount, fromAccount, toAccount) {
   await sendEmail(to, subject, text, html);
 }
 
-module.exports = { sendEmail, sendRegistrationEmail, sendLoginEmail, sendTransactionEmail, sendReversalEmail };
+async function sendPasswordResetEmail(to, name, resetLink) {
+  const subject = 'Reset Your Password - Bank Transaction System';
+  const text = `Hello ${name},\n\nWe received a request to reset your password. Use the link below to set a new password:\n${resetLink}\n\nThis link will expire in 15 minutes. If you did not request this, please ignore this email.\n\nBest regards,\nBank Transaction System Team`;
+  const html = `<p>Hello ${name},</p><p>We received a request to reset your password.</p><p>Use the link below to set a new password:</p><p><a href="${resetLink}">${resetLink}</a></p><p>This link will expire in 15 minutes.</p><p>If you did not request this, please ignore this email.</p><p>Best regards,<br>Bank Transaction System Team</p>`;
+
+  await sendEmail(to, subject, text, html);
+}
+
+module.exports = { sendEmail, sendRegistrationEmail, sendLoginEmail, sendTransactionEmail, sendReversalEmail, sendPasswordResetEmail };

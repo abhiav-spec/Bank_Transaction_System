@@ -2,6 +2,10 @@ const userModel = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const emailService = require('../services/email.service');
+const tokenblacklistModel = require('../models/tokenblacklist.model');
+const { generateResetToken, hashResetToken } = require('../utils/resetToken.util');
+
+const FORGOT_PASSWORD_SUCCESS_MESSAGE = 'If an account with that email exists, a password reset link has been sent.';
 
 
 /* user registration  controllers */
@@ -30,7 +34,7 @@ async function userRegistercontroller(req, res) {
             password
         });
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: user._id, tokenVersion: user.tokenVersion }, process.env.JWT_SECRET, { expiresIn: '1d' });
         res.cookie('token', token, { httpOnly: true });
 
         await emailService.sendRegistrationEmail(user.email, user.name);
@@ -82,7 +86,7 @@ async function userLogincontroller(req, res) {
             });
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ id: user._id, tokenVersion: user.tokenVersion }, process.env.JWT_SECRET, { expiresIn: '1d' });
         await emailService.sendLoginEmail(user.email, user.name);
         return res.status(200).json({
             message: "User logged in successfully",
@@ -102,7 +106,134 @@ async function userLogincontroller(req, res) {
     }
 }
 
+const userlogoutcontroller = async (req, res) => {
+    const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(400).json({
+            message: "No token provided",
+            status: false,
+        });
+    }
+    res.clearCookie('token');
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        await tokenblacklistModel.create({ token });
+        return res.status(200).json({
+            message: "User logged out successfully",
+            status: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Internal server error",
+            status: false,
+        });
+    }
+
+}
+
+async function forgotPasswordController(req, res) {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                message: 'Email is required',
+                status: false,
+            });
+        }
+
+        const user = await userModel.findOne({ email: email.toLowerCase().trim() }).select('+resetPasswordToken +resetPasswordExpire');
+
+        if (user) {
+            const resetToken = generateResetToken();
+            const hashedToken = hashResetToken(resetToken);
+            const resetPasswordExpire = Date.now() + 15 * 60 * 1000;
+
+            user.resetPasswordToken = hashedToken;
+            user.resetPasswordExpire = resetPasswordExpire;
+            await user.save({ validateBeforeSave: false });
+
+            const resetBaseUrl = process.env.PASSWORD_RESET_URL || process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000';
+            const resetLink = `${resetBaseUrl.replace(/\/$/, '')}/reset-password?token=${resetToken}`;
+            await emailService.sendPasswordResetEmail(user.email, user.name, resetLink);
+        }
+
+        return res.status(200).json({
+            message: FORGOT_PASSWORD_SUCCESS_MESSAGE,
+            status: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Internal server error',
+            status: false,
+        });
+    }
+}
+
+async function resetPasswordController(req, res) {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({
+                message: 'Token and newPassword are required',
+                status: false,
+            });
+        }
+
+        if (String(newPassword).length < 8) {
+            return res.status(400).json({
+                message: 'Password must be at least 8 characters long',
+                status: false,
+            });
+        }
+
+        const hashedToken = hashResetToken(token);
+
+        const user = await userModel.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpire: { $gt: Date.now() },
+        }).select('+resetPasswordToken +resetPasswordExpire +password tokenVersion');
+
+        if (!user) {
+            return res.status(400).json({
+                message: 'Invalid or expired reset token',
+                status: false,
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await userModel.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    password: hashedPassword,
+                    tokenVersion: (user.tokenVersion || 0) + 1,
+                },
+                $unset: {
+                    resetPasswordToken: 1,
+                    resetPasswordExpire: 1,
+                },
+            }
+        );
+
+        return res.status(200).json({
+            message: 'Password reset successfully',
+            status: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Internal server error',
+            status: false,
+        });
+    }
+}
+
 module.exports = {
     userRegistercontroller,
-    userLogincontroller
-}
+    userLogincontroller,
+    userlogoutcontroller,
+    forgotPasswordController,
+    resetPasswordController,
+};
