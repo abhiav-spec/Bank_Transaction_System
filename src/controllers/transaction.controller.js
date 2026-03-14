@@ -1,15 +1,16 @@
 const transactionModel = require('../models/transaction.model');
 const ledgerModel = require('../models/ledger.model');
 const accountModel = require('../models/account.model');
+const userModel = require('../models/user.model');
 const emailService = require('../services/email.service');
 const mongoose = require('mongoose');
 
 async function createTransactionController(req, res) {
-    const { fromAccount, toAccount, amount, idempotencyKey } = req.body;
+    const { fromAccount, toAccount, amount, idempotencyKey, transactionPassword } = req.body;
 
-    if (!fromAccount || !toAccount || !amount || !idempotencyKey) {
+    if (!fromAccount || !toAccount || !amount || !idempotencyKey || !transactionPassword) {
         return res.status(400).json({
-            message: "All fields are required",
+            message: "fromAccount, toAccount, amount, idempotencyKey and transactionPassword are required",
             status: false,
         });
     }
@@ -19,10 +20,41 @@ async function createTransactionController(req, res) {
     try {
         const fromUserAccount = await accountModel.findById(fromAccount).populate('user');
         const toUserAccount = await accountModel.findById(toAccount).populate('user');
+        const user = await userModel.findById(req.user._id).select('+transactionPin');
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+                status: false,
+            });
+        }
+
+        if (!user.transactionPin) {
+            return res.status(400).json({
+                message: "Transaction password is not set. Please set it first.",
+                status: false,
+            });
+        }
+
+        const isPinValid = await user.compareTransactionPin(String(transactionPassword));
+
+        if (!isPinValid) {
+            return res.status(401).json({
+                message: "Invalid transaction password",
+                status: false,
+            });
+        }
 
         if (!fromUserAccount || !toUserAccount) {
             return res.status(404).json({
                 message: "From or To account not found",
+                status: false,
+            });
+        }
+
+        if (String(fromUserAccount.user?._id || fromUserAccount.user) !== String(req.user._id)) {
+            return res.status(403).json({
+                message: "fromAccount must belong to logged-in user",
                 status: false,
             });
         }

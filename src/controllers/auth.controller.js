@@ -230,10 +230,120 @@ async function resetPasswordController(req, res) {
     }
 }
 
+async function setTransactionPinController(req, res) {
+    try {
+        const { transactionPassword } = req.body;
+
+        if (!transactionPassword) {
+            return res.status(400).json({
+                message: 'transactionPassword is required',
+                status: false,
+            });
+        }
+
+        if (!/^\d{4,6}$/.test(String(transactionPassword))) {
+            return res.status(400).json({
+                message: 'transactionPassword must be 4 to 6 digits',
+                status: false,
+            });
+        }
+
+        const user = await userModel.findById(req.user._id).select('+transactionPin');
+
+        if (!user) {
+            return res.status(404).json({
+                message: 'User not found',
+                status: false,
+            });
+        }
+
+        if (user.transactionPin) {
+            return res.status(409).json({
+                message: 'Transaction password already set. Use update endpoint.',
+                status: false,
+            });
+        }
+
+        const hashedPin = await bcrypt.hash(String(transactionPassword), 10);
+
+        await userModel.updateOne(
+            { _id: user._id },
+            { $set: { transactionPin: hashedPin } }
+        );
+
+        return res.status(200).json({
+            message: 'Transaction password set successfully',
+            status: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Internal server error',
+            status: false,
+        });
+    }
+}
+
+async function updateTransactionPinController(req, res) {
+    try {
+        const { currentTransactionPassword, newTransactionPassword } = req.body;
+
+        if (!currentTransactionPassword || !newTransactionPassword) {
+            return res.status(400).json({
+                message: 'currentTransactionPassword and newTransactionPassword are required',
+                status: false,
+            });
+        }
+
+        if (!/^\d{4,6}$/.test(String(newTransactionPassword))) {
+            return res.status(400).json({
+                message: 'newTransactionPassword must be 4 to 6 digits',
+                status: false,
+            });
+        }
+
+        const user = await userModel.findById(req.user._id).select('+transactionPin');
+
+        if (!user || !user.transactionPin) {
+            return res.status(404).json({
+                message: 'Transaction password is not set',
+                status: false,
+            });
+        }
+
+        const isCurrentPinValid = await bcrypt.compare(String(currentTransactionPassword), user.transactionPin);
+
+        if (!isCurrentPinValid) {
+            return res.status(401).json({
+                message: 'Current transaction password is incorrect',
+                status: false,
+            });
+        }
+
+        const hashedPin = await bcrypt.hash(String(newTransactionPassword), 10);
+
+        await userModel.updateOne(
+            { _id: user._id },
+            { $set: { transactionPin: hashedPin } }
+        );
+
+        return res.status(200).json({
+            message: 'Transaction password updated successfully',
+            status: true,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || 'Internal server error',
+            status: false,
+        });
+    }
+}
+
 module.exports = {
     userRegistercontroller,
     userLogincontroller,
     userlogoutcontroller,
     forgotPasswordController,
     resetPasswordController,
+    setTransactionPinController,
+    updateTransactionPinController,
 };

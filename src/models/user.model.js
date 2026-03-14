@@ -23,6 +23,10 @@ password: {
     minlength: [6, "Password must be at least 6 characters long"],
     select: false
 },
+transactionPin: {
+    type: String,
+    select: false,
+},
 resetPasswordToken: {
     type: String,
     select: false,
@@ -56,6 +60,14 @@ userSchema.pre('save', async function() {
 
 userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.compareTransactionPin = async function(candidatePin) {
+    if (!this.transactionPin) {
+        return false;
+    }
+
+    return await bcrypt.compare(candidatePin, this.transactionPin);
 };
 
 const User = mongoose.model('User', userSchema);

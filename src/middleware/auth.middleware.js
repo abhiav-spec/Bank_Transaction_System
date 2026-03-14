@@ -23,7 +23,7 @@ const isbalacklisted = await tokenblacklistModel.findOne({ token });
     
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(decoded.id).select('-password tokenVersion');
+        const user = await userModel.findById(decoded.id);
         req.user = user;
         if (!user) {
             return res.status(401).json({
@@ -66,7 +66,7 @@ const isbalacklisted = await tokenblacklistModel.findOne({ token });
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await userModel.findById(decoded.id).select('-password +systemUser tokenVersion');
+        const user = await userModel.findById(decoded.id).select('+systemUser');
         if (!user || !user.systemUser) {
             return res.status(403).json({
                 message: "Only system users can access this resource",

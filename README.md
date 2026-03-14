@@ -11,6 +11,7 @@ The **Bank Transaction System** is designed as a backend API for basic digital b
 - User registration, login, logout
 - Account creation and account balance tracking
 - User-to-user fund transfer (with idempotency support)
+- UPI-style transaction password (PIN) required for fund transfer
 - System user controlled initial deposit flow
 - Secure forgot/reset password flow with one-time token expiry
 - Email notifications for auth and transaction events
@@ -29,6 +30,7 @@ The project follows a modular structure using controllers, models, services, rou
   - [Account Flow](#account-flow)
   - [Transaction Flow](#transaction-flow)
   - [System Initial Funds Flow](#system-initial-funds-flow)
+  - [Transaction Password Flow](#transaction-password-flow)
   - [Forgot/Reset Password Flow](#forgotreset-password-flow)
 - [API Base URL](#api-base-url)
 - [Authentication](#authentication)
@@ -104,6 +106,14 @@ The project follows a modular structure using controllers, models, services, rou
 4. Server issues JWT with `id` and `tokenVersion`.
 5. Logout blacklists token using `tokenblacklist` collection.
 
+### Transaction Password Flow
+
+1. Authenticated user sets transaction password (4 to 6 digits) using set API.
+2. User can update transaction password using current + new transaction password.
+3. Transaction password is stored as bcrypt hash in user profile.
+4. Every fund transfer requires valid `transactionPassword`.
+5. Transfer fails if transaction password is missing/wrong or not set.
+
 ### Account Flow
 
 1. Authenticated user creates an account with a currency code (e.g. `INR`).
@@ -114,8 +124,8 @@ The project follows a modular structure using controllers, models, services, rou
 ### Transaction Flow
 
 1. Authenticated user requests transfer using:
-   - `fromAccount`, `toAccount`, `amount`, `idempotencyKey`
-2. Server validates accounts, active status, idempotency key, and available balance.
+  - `fromAccount`, `toAccount`, `amount`, `idempotencyKey`, `transactionPassword`
+2. Server validates transaction password, account ownership (`fromAccount` must belong to logged-in user), active status, idempotency key, and available balance.
 3. Transaction + ledger debit/credit are done in MongoDB session transaction.
 4. Emails are sent to both account owners.
 
@@ -257,6 +267,47 @@ Reset password using token.
 
 ---
 
+#### `POST /api/auth/transaction-password/set`
+
+Set transaction password (PIN) for logged-in user.
+
+**Header**
+
+```bash
+Authorization: Bearer <token>
+```
+
+**Body**
+
+```json
+{
+  "transactionPassword": "1234"
+}
+```
+
+---
+
+#### `POST /api/auth/transaction-password/update`
+
+Update transaction password (PIN) for logged-in user.
+
+**Header**
+
+```bash
+Authorization: Bearer <token>
+```
+
+**Body**
+
+```json
+{
+  "currentTransactionPassword": "1234",
+  "newTransactionPassword": "5678"
+}
+```
+
+---
+
 ### Account APIs
 
 #### `GET /api/accounts`
@@ -304,7 +355,8 @@ Transfer funds between accounts.
   "fromAccount": "<accountId>",
   "toAccount": "<accountId>",
   "amount": 300,
-  "idempotencyKey": "txn-unique-key-001"
+  "idempotencyKey": "txn-unique-key-001",
+  "transactionPassword": "1234"
 }
 ```
 
@@ -376,6 +428,9 @@ npm run dev
 - Password hashing with bcrypt
 - JWT auth with token blacklist on logout
 - Token version check to invalidate old sessions after password reset
+- Transaction password (PIN) stored as bcrypt hash
+- Transaction password required for user-to-user transfers
+- Sender account ownership check on transfers
 - System-user restricted initial funding endpoint
 - Idempotency key for transactions
 - MongoDB transactions for ledger consistency
