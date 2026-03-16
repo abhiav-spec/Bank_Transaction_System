@@ -1,26 +1,42 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import ThreeBackground from '../../components/ThreeBackground';
 import GlassCard from '../../components/GlassCard';
+import AuthNavbar from '../../components/AuthNavbar';
 import { clearAuthMessages, registerUser } from '../../features/auth/authSlice';
+import bgBanking from '../../assets/istockphoto-1268431528-612x612.jpg';
 
 export default function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsError, setTermsError] = useState('');
 
   const onChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'confirmPassword' || name === 'password') {
+      setPasswordError('');
+    }
   };
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    if (!agreedToTerms) {
+      setTermsError('Please agree to the Terms of Service & Privacy Policy.');
+      return;
+    }
+    setTermsError('');
     dispatch(clearAuthMessages());
     try {
-      await dispatch(registerUser(form)).unwrap();
+      await dispatch(registerUser({ name: form.name, email: form.email, password: form.password })).unwrap();
       navigate('/login');
     } catch {
       return null;
@@ -28,23 +44,178 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative grid min-h-screen place-items-center p-4">
-      <ThreeBackground />
-      <GlassCard className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold text-white">Create Account</h1>
-        <form className="space-y-3" onSubmit={onSubmit}>
-          <input name="name" placeholder="Full name" className="glass-input" value={form.name} onChange={onChange} required />
-          <input name="email" type="email" placeholder="Email" className="glass-input" value={form.email} onChange={onChange} required />
-          <input name="password" type="password" placeholder="Password" className="glass-input" value={form.password} onChange={onChange} required />
-          <button type="submit" className="primary-btn w-full" disabled={loading}>
-            {loading ? 'Creating...' : 'Register'}
-          </button>
-        </form>
-        {error && <p className="text-sm text-rose-200">{error}</p>}
-        <p className="text-sm text-slate-200">
-          Already have an account? <Link to="/login" className="text-cyan-200">Login</Link>
-        </p>
-      </GlassCard>
+    <div className="relative min-h-screen w-full overflow-hidden">
+
+      {/* ─── Full-page background image ─── */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={bgBanking}
+          alt="background"
+          className="h-full w-full object-cover object-center"
+        />
+        {/* sky-blue tinted blur overlay */}
+        <div className="absolute inset-0 bg-sky-900/55 backdrop-blur-[3px]" />
+        {/* subtle gradient wash */}
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-400/30 via-cyan-300/15 to-sky-600/30" />
+      </div>
+
+      {/* ─── Navbar ─── */}
+      <AuthNavbar />
+
+      {/* ─── Main content ─── */}
+      <main className="relative z-10 flex min-h-[calc(100vh-72px)] w-full items-center justify-center px-4 py-10">
+        <div className="flex w-full max-w-5xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
+
+          {/* Left: bank name + tagline */}
+          <div className="max-w-md text-center lg:text-left">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
+              Join Today
+            </p>
+            <h1
+              className="mb-4 text-5xl font-extrabold leading-tight tracking-tight text-sky-200 drop-shadow-lg"
+              style={{ textShadow: '0 0 32px rgba(56,189,248,0.45)' }}
+            >
+              NexaBank
+            </h1>
+            <p className="text-base font-medium leading-relaxed text-sky-100/80">
+              Open your account in minutes.<br className="hidden lg:block" />
+              Secure, smart &amp; effortless banking — built for you.
+            </p>
+            <div className="mt-6 hidden flex-col gap-3 lg:flex">
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-400/20 ring-1 ring-sky-400/40">
+                  <svg className="h-3.5 w-3.5 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm text-sky-200/80">Zero hidden fees</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-400/20 ring-1 ring-sky-400/40">
+                  <svg className="h-3.5 w-3.5 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm text-sky-200/80">256-bit encrypted transactions</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-400/20 ring-1 ring-sky-400/40">
+                  <svg className="h-3.5 w-3.5 text-sky-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-sm text-sky-200/80">24/7 customer support</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: register card */}
+          <GlassCard className="w-full max-w-[420px] space-y-5 !border-white/20 !bg-white/10 !shadow-2xl !backdrop-blur-xl">
+
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold text-white">Create Account</h2>
+              <p className="text-sm text-sky-200/80">Start your NexaBank journey today</p>
+            </div>
+
+            <form className="space-y-4" onSubmit={onSubmit}>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-sky-200/70">Full Name</label>
+                <input
+                  name="name"
+                  type="text"
+                  placeholder="Your full name"
+                  className="w-full border-0 border-b border-sky-300/40 bg-transparent px-0 py-2 text-white placeholder:text-sky-300/50 focus:border-b-sky-300 focus:outline-none focus:ring-0"
+                  value={form.name}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-sky-200/70">Email</label>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email address"
+                  className="w-full border-0 border-b border-sky-300/40 bg-transparent px-0 py-2 text-white placeholder:text-sky-300/50 focus:border-b-sky-300 focus:outline-none focus:ring-0"
+                  value={form.email}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-sky-200/70">Password</label>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Create a password"
+                  className="w-full border-0 border-b border-sky-300/40 bg-transparent px-0 py-2 text-white placeholder:text-sky-300/50 focus:border-b-sky-300 focus:outline-none focus:ring-0"
+                  value={form.password}
+                  onChange={onChange}
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase tracking-wide text-sky-200/70">Confirm Password</label>
+                <input
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Repeat your password"
+                  className="w-full border-0 border-b border-sky-300/40 bg-transparent px-0 py-2 text-white placeholder:text-sky-300/50 focus:border-b-sky-300 focus:outline-none focus:ring-0"
+                  value={form.confirmPassword}
+                  onChange={onChange}
+                  required
+                />
+                {passwordError && (
+                  <p className="text-xs text-red-300">{passwordError}</p>
+                )}
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-sky-200/70">
+                <input
+                  type="checkbox"
+                  checked={agreedToTerms}
+                  onChange={(event) => {
+                    setAgreedToTerms(event.target.checked);
+                    if (event.target.checked) {
+                      setTermsError('');
+                    }
+                  }}
+                  className="h-3.5 w-3.5 rounded border-sky-300/40 accent-sky-400"
+                />
+                I agree to the Terms of Service &amp; Privacy Policy
+              </label>
+
+              {termsError && (
+                <p className="text-xs text-red-300">{termsError}</p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-4 py-2.5 font-semibold text-white shadow-lg shadow-sky-500/30 transition-all duration-200 hover:scale-[1.02] hover:from-sky-300 hover:to-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={loading || !agreedToTerms}
+              >
+                {loading ? 'Creating account…' : 'Create Account'}
+              </button>
+            </form>
+
+            {error && (
+              <p className="rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-200">
+                {error}
+              </p>
+            )}
+
+            <p className="text-center text-sm text-sky-300">
+              Already have an account?{' '}
+              <Link to="/login" className="font-semibold text-white transition hover:text-sky-200">
+                Sign In
+              </Link>
+            </p>
+          </GlassCard>
+        </div>
+      </main>
     </div>
   );
 }
