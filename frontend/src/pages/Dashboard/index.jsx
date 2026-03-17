@@ -113,7 +113,7 @@ export default function DashboardPage() {
       </div>
 
       
-      <div className="flex items-center gap-1">
+      <div className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white/55 px-1 py-1 shadow-sm backdrop-blur-sm">
         {[
           { key: 'all', label: 'All Cards' },
           { key: 'selected', label: 'Selected' },
@@ -125,10 +125,10 @@ export default function DashboardPage() {
               setActiveTab(tab.key);
               setActiveCardIdx(0);
             }}
-            className={`text-sm px-4 py-1.5 rounded-full transition font-medium ${
+            className={`text-sm px-4 py-1.5 rounded-full transition font-semibold ${
               activeTab === tab.key
-                ? 'text-gray-900 border-b-2 border-gray-900'
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'text-slate-700 hover:bg-white/60 hover:text-slate-900'
             }`}
           >
             {tab.label}
