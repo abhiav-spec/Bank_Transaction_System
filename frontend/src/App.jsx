@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAdminAccess, hydrateAuthFromStorage, logoutUser } from './features/auth/authSlice';
@@ -78,6 +78,7 @@ function AppLayout() {
 function AdminLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -98,11 +99,15 @@ function AdminLayout() {
       </div>
 
       {/* Fixed navbar */}
-      <AdminNavbar />
+      <AdminNavbar onMenuToggle={() => setAdminMenuOpen(true)} />
 
       {/* Main content area */}
       <div className="flex-1 mx-auto flex max-w-7xl w-full flex-col gap-4 px-4 pb-6 pt-6 md:px-6 lg:flex-row">
-        <AdminSidebar onLogout={handleLogout} />
+        <AdminSidebar
+          onLogout={handleLogout}
+          isOpen={adminMenuOpen}
+          onClose={() => setAdminMenuOpen(false)}
+        />
         <main className="flex-1">
           <Outlet />
         </main>

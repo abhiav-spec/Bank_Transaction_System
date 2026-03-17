@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function AboutModal({ onClose }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center"
       onClick={onClose}
     >
       {/* backdrop */}
@@ -13,7 +13,7 @@ function AboutModal({ onClose }) {
 
       {/* panel */}
       <div
-        className="relative w-full max-w-2xl rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl"
+        className="relative my-4 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl sm:my-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* close button */}
@@ -71,6 +71,13 @@ function AboutModal({ onClose }) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
           <p className="text-xs text-sky-300/60">© {new Date().getFullYear()} NexaBank. All rights reserved.</p>
           <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-sky-100 ring-1 ring-white/20 transition hover:bg-white/20"
+            >
+              Close
+            </button>
             <Link
               to="/register"
               onClick={onClose}

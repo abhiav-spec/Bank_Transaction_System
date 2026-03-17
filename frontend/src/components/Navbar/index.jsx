@@ -103,10 +103,10 @@ export default function Navbar() {
   const latestTxns = Array.isArray(transactions) ? transactions.slice(0, 6) : [];
 
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-56 z-30 h-16 bg-white/10 backdrop-blur-xl border-b border-white/20 flex items-center px-4 md:px-6 gap-4 shadow-[0_8px_30px_rgba(15,23,42,0.15)]">
+    <header className="fixed top-0 right-0 left-0 lg:left-56 z-30 h-16 bg-white/10 backdrop-blur-xl border-b border-white/20 flex items-center px-3 sm:px-4 md:px-6 gap-2 sm:gap-4 shadow-[0_8px_30px_rgba(15,23,42,0.15)]">
 
       {/* ── Search ── */}
-      <div className="flex-1 max-w-sm ml-10 lg:ml-0 relative" ref={searchRef}>
+      <div className="flex-1 max-w-[11rem] sm:max-w-sm ml-10 lg:ml-0 relative" ref={searchRef}>
         <div className="relative">
           <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
             <IconSearch />
@@ -169,7 +169,7 @@ export default function Navbar() {
 
           {/* Notification dropdown */}
           {showNotifs && (
-            <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
+            <div className="absolute right-0 top-full mt-2 w-[90vw] max-w-sm bg-white border border-gray-200 rounded-2xl shadow-xl z-50 overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                 <span className="text-sm font-semibold text-gray-800">Recent Transactions</span>
                 <button
