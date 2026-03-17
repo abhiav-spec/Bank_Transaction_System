@@ -15,8 +15,8 @@ export default function TransactionsPage() {
   return (
     <div className="space-y-4">
       <GlassCard>
-        <h1 className="text-2xl font-bold text-white">Transactions</h1>
-        <p className="text-sm text-slate-200">Complete transfer history across your accounts.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
+        <p className="text-sm text-gray-500">Complete transfer history across your accounts.</p>
       </GlassCard>
       <TransactionTable transactions={transactions} />
     </div>

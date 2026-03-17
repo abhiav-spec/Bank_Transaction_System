@@ -15,8 +15,8 @@ export default function TransferPage() {
   return (
     <div className="space-y-4">
       <GlassCard>
-        <h1 className="text-2xl font-bold text-white">Transfer Money</h1>
-        <p className="text-sm text-slate-200">Send secure transfers using your transaction PIN.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Transfer Money</h1>
+        <p className="text-sm text-gray-500">Send secure transfers using your transaction PIN.</p>
       </GlassCard>
       <TransferForm accounts={accounts} />
     </div>

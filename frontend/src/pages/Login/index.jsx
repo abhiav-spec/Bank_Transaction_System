@@ -70,7 +70,7 @@ export default function LoginPage() {
             </p>
             <div className="mt-6 hidden items-center gap-3 lg:flex">
               <span className="h-px w-12 bg-sky-400/60" />
-              <span className="text-xs text-sky-300/70">Trusted by 1M+ customers</span>
+              <span className="text-xs text-sky-300/70">Built for secure digital banking</span>
             </div>
           </div>
 

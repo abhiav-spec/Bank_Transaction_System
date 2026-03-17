@@ -30,11 +30,11 @@ This is the **main project README** for running and understanding the complete s
 This project provides a secure digital banking workflow:
 
 - User registration/login/logout
-- 4-step KYC-based account creation
+- Dedicated account creation page with 4-step KYC flow (`/accounts/create`)
 - Account balance via ledger model (credit/debit)
 - User-to-user transfer with idempotency and transaction PIN
 - System-user-only initial funding endpoint
-- Forgot/reset password with secure token flow
+- Forgot/reset password with secure token flow (reset token from URL, not shown in form)
 - Admin dashboard for account control and system operations
 
 ---
@@ -96,8 +96,10 @@ Bank_Transaction_System/
 ## Core Features
 
 - **Auth:** register, login, logout, token blacklist, token version invalidation
+- **Auth UI:** modern split-screen Login/Register/Forgot/Reset pages with shared auth navbar + About modal
+- **Auth Guardrails:** Login and Register require Terms checkbox before submit
 - **Password Reset:** forgot/reset with hashed reset token + expiry
-- **Accounts:** 4-step KYC flow, Aadhaar validation, max-3 account rule
+- **Accounts:** separate account list page (`/accounts`) and dedicated create page (`/accounts/create`) with 4-step KYC, Aadhaar validation, max-3 account rule
 - **Transfers:** idempotency key + transaction PIN required
 - **System Funding:** protected endpoint for system user only
 - **Admin Console:**
@@ -197,6 +199,8 @@ Recommended startup order:
 - Frontend uses Axios instance in `frontend/src/services/api.js`
 - JWT token is attached through Axios request interceptor
 - Admin access check is performed through system account API authorization
+- User account creation is initiated from `/accounts/create` and account listing remains on `/accounts`
+- Reset password page reads token from URL query (`/reset-password?token=...`) and does not expose token input
 - Funding API used by admin page:
   - `POST /api/transactions/system/initial-funds`
 

@@ -8,9 +8,11 @@ import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
 import DashboardPage from './pages/Dashboard';
 import AccountsPage from './pages/Accounts';
+import CreateAccountPage from './pages/CreateAccount';
 import TransferPage from './pages/Transfer';
 import TransactionsPage from './pages/Transactions';
 import ProfilePage from './pages/Profile';
+import SelectCardPage from './pages/SelectCard';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import AdminNavbar from './components/admin/AdminNavbar';
@@ -21,6 +23,7 @@ import AllAccountsPage from './pages/Admin/AllAccounts';
 import AdminUsersPage from './pages/Admin/Users';
 import AdminTransactionsPage from './pages/Admin/Transactions';
 import SystemFundingPage from './pages/Admin/SystemFunding';
+import bgWoman from './assets/istockphoto-1268431528-612x612.jpg';
 
 function ProtectedRoute() {
   const token = useSelector((state) => state.auth.token);
@@ -46,11 +49,25 @@ function UserRoute() {
 
 function AppLayout() {
   return (
-    <div className="min-h-screen text-white">
-      <Navbar />
-      <div className="mx-auto flex max-w-7xl gap-4 px-4 pb-6 pt-20 md:px-6">
-        <Sidebar />
-        <main className="flex-1">
+    <div className="relative flex min-h-screen overflow-hidden">
+      {/* Login-like background for all user pages after authentication */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={bgWoman}
+          alt="dashboard background"
+          className="h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-sky-900/55 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 via-cyan-300/10 to-sky-600/20" />
+      </div>
+
+      {/* Fixed left sidebar */}
+      <Sidebar />
+      {/* Main area offset by sidebar width */}
+      <div className="flex-1 flex flex-col lg:ml-56">
+        <Navbar />
+        {/* Content below the fixed top header (h-16) */}
+        <main className="flex-1 mt-16 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
@@ -114,8 +131,10 @@ function App() {
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
+            <Route path="/accounts/create" element={<CreateAccountPage />} />
             <Route path="/transfer" element={<TransferPage />} />
             <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/select-card" element={<SelectCardPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

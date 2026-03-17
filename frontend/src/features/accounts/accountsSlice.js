@@ -5,6 +5,7 @@ const initialState = {
   list: [],
   balances: {},
   adminAccounts: [],
+  selectedPaymentAccountId: typeof window !== 'undefined' ? localStorage.getItem('selectedPaymentAccountId') || '' : '',
   loading: false,
   error: null,
   successMessage: null,
@@ -43,6 +44,13 @@ const accountsSlice = createSlice({
       state.error = null;
       state.successMessage = null;
     },
+    setSelectedPaymentAccount: (state, action) => {
+      state.selectedPaymentAccountId = action.payload || '';
+      if (typeof window !== 'undefined') {
+        if (action.payload) localStorage.setItem('selectedPaymentAccountId', action.payload);
+        else localStorage.removeItem('selectedPaymentAccountId');
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -52,6 +60,15 @@ const accountsSlice = createSlice({
       .addCase(fetchAccounts.fulfilled, (state, action) => {
         state.loading = false;
         state.list = action.payload;
+        if (
+          state.selectedPaymentAccountId
+          && !action.payload.some((account) => account._id === state.selectedPaymentAccountId)
+        ) {
+          state.selectedPaymentAccountId = '';
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('selectedPaymentAccountId');
+          }
+        }
         state.error = null;
       })
       .addCase(fetchAccounts.rejected, (state, action) => {
@@ -99,5 +116,5 @@ const accountsSlice = createSlice({
   },
 });
 
-export const { clearAccountMessages } = accountsSlice.actions;
+export const { clearAccountMessages, setSelectedPaymentAccount } = accountsSlice.actions;
 export default accountsSlice.reducer;

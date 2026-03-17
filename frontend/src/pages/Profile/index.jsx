@@ -33,14 +33,14 @@ export default function ProfilePage() {
   return (
     <div className="space-y-4">
       <GlassCard>
-        <h1 className="text-2xl font-bold text-white">Profile</h1>
-        <p className="text-sm text-slate-200">Name: {user?.name}</p>
-        <p className="text-sm text-slate-200">Email: {user?.email}</p>
+        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
+        <p className="text-sm text-gray-500">Name: {user?.name}</p>
+        <p className="text-sm text-gray-500">Email: {user?.email}</p>
       </GlassCard>
 
       <div className="grid gap-4 md:grid-cols-2">
         <GlassCard>
-          <h2 className="mb-3 text-lg font-semibold text-white">Set Transaction Password</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800">Set Transaction Password</h2>
           <form className="space-y-3" onSubmit={handleSetPin}>
             <input
               type="password"
@@ -54,7 +54,7 @@ export default function ProfilePage() {
         </GlassCard>
 
         <GlassCard>
-          <h2 className="mb-3 text-lg font-semibold text-white">Update Transaction Password</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-800">Update Transaction Password</h2>
           <form className="space-y-3" onSubmit={handleUpdatePin}>
             <input
               type="password"
@@ -79,8 +79,8 @@ export default function ProfilePage() {
         </GlassCard>
       </div>
 
-      {successMessage && <p className="text-sm text-emerald-200">{successMessage}</p>}
-      {error && <p className="text-sm text-rose-200">{error}</p>}
+      {successMessage && <p className="text-sm text-emerald-600">{successMessage}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
     </div>
   );
 }
