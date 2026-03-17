@@ -100,15 +100,15 @@ export default function DashboardPage() {
       {/* ── Page title ── */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Cards</h1>
-        {/* <Link
+        <Link
           to="/accounts/create"
           className="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition shadow-sm"
         >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          Add new card
-        </Link>*/}
+          Create Account
+        </Link>
     
       </div>
 

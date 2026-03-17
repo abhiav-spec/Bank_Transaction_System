@@ -4,6 +4,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import GlassCard from '../../components/GlassCard';
 import { createAccount, fetchAccounts } from '../../features/accounts/accountsSlice';
 
+const FULL_NAME_REGEX = /^[A-Za-z][A-Za-z\s.'-]{1,49}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const AADHAAR_REGEX = /^\d{12}$/;
+const PHONE_REGEX = /^(?:\+91)?[6-9]\d{9}$/;
+const CURRENCY_REGEX = /^[A-Z]{3}$/;
+
+const OPERATIONAL_COUNTRIES = [
+  'India',
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Australia',
+  'Singapore',
+  'United Arab Emirates',
+  'Germany',
+  'France',
+  'Japan',
+];
+
 const initialForm = {
   personalDetails: { fullName: '', email: '', nationality: '' },
   identityDetails: { aadhaarNumber: '', phoneNumber: '' },
@@ -18,14 +37,21 @@ export default function CreateAccountPage() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(initialForm);
 
+  const fullNameValid = FULL_NAME_REGEX.test(form.personalDetails.fullName.trim());
+  const emailValid = EMAIL_REGEX.test(form.personalDetails.email.trim());
+  const nationalityValid = OPERATIONAL_COUNTRIES.includes(form.personalDetails.nationality);
+  const aadhaarValid = AADHAAR_REGEX.test(form.identityDetails.aadhaarNumber.trim());
+  const phoneValid = PHONE_REGEX.test(form.identityDetails.phoneNumber.trim());
+  const currencyValid = CURRENCY_REGEX.test(form.accountDetails.currency.trim());
+
   const canGoNext = useMemo(() => {
     if (step === 1) {
-      return form.personalDetails.fullName && form.personalDetails.email && form.personalDetails.nationality;
+      return fullNameValid && emailValid && nationalityValid;
     }
-    if (step === 2) return form.identityDetails.aadhaarNumber && form.identityDetails.phoneNumber;
-    if (step === 3) return form.accountDetails.accountType;
+    if (step === 2) return aadhaarValid && phoneValid;
+    if (step === 3) return currencyValid && form.accountDetails.accountType;
     return true;
-  }, [form, step]);
+  }, [step, fullNameValid, emailValid, nationalityValid, aadhaarValid, phoneValid, currencyValid]);
 
   const submitKyc = async (event) => {
     event.preventDefault();
@@ -76,6 +102,9 @@ export default function CreateAccountPage() {
                   }))
                 }
               />
+              {form.personalDetails.fullName && !fullNameValid && (
+                <p className="text-xs text-red-600">Enter a valid full name (letters and spaces only, min 2 chars).</p>
+              )}
               <input
                 className="glass-input"
                 placeholder="Email"
@@ -88,9 +117,11 @@ export default function CreateAccountPage() {
                   }))
                 }
               />
-              <input
+              {form.personalDetails.email && !emailValid && (
+                <p className="text-xs text-red-600">Enter a valid email address (example: user@example.com).</p>
+              )}
+              <select
                 className="glass-input"
-                placeholder="Nationality"
                 value={form.personalDetails.nationality}
                 onChange={(event) =>
                   setForm((prev) => ({
@@ -98,7 +129,15 @@ export default function CreateAccountPage() {
                     personalDetails: { ...prev.personalDetails, nationality: event.target.value },
                   }))
                 }
-              />
+              >
+                <option value="">Select Nationality (Operational Countries)</option>
+                {OPERATIONAL_COUNTRIES.map((country) => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
+              </select>
+              {!nationalityValid && form.personalDetails.nationality && (
+                <p className="text-xs text-red-600">Select a supported country from the list.</p>
+              )}
             </>
           )}
 
@@ -107,26 +146,34 @@ export default function CreateAccountPage() {
               <input
                 className="glass-input"
                 placeholder="Aadhaar Number"
+                inputMode="numeric"
+                maxLength={12}
                 value={form.identityDetails.aadhaarNumber}
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    identityDetails: { ...prev.identityDetails, aadhaarNumber: event.target.value },
+                    identityDetails: { ...prev.identityDetails, aadhaarNumber: event.target.value.replace(/\D/g, '') },
                   }))
                 }
               />
+              {form.identityDetails.aadhaarNumber && !aadhaarValid && (
+                <p className="text-xs text-red-600">Aadhaar must be exactly 12 digits.</p>
+              )}
               <input
                 className="glass-input"
                 type="tel"
-                placeholder="Phone Number"
+                placeholder="Phone Number (e.g. 9876543210 or +919876543210)"
                 value={form.identityDetails.phoneNumber}
                 onChange={(event) =>
                   setForm((prev) => ({
                     ...prev,
-                    identityDetails: { ...prev.identityDetails, phoneNumber: event.target.value },
+                    identityDetails: { ...prev.identityDetails, phoneNumber: event.target.value.replace(/\s+/g, '') },
                   }))
                 }
               />
+              {form.identityDetails.phoneNumber && !phoneValid && (
+                <p className="text-xs text-red-600">Enter a valid Indian mobile number.</p>
+              )}
             </>
           )}
 
@@ -143,6 +190,9 @@ export default function CreateAccountPage() {
                   }))
                 }
               />
+              {form.accountDetails.currency && !currencyValid && (
+                <p className="text-xs text-red-600">Currency must be a 3-letter ISO code (e.g. INR).</p>
+              )}
               <select
                 className="glass-input"
                 value={form.accountDetails.accountType}
