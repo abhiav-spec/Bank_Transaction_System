@@ -48,14 +48,14 @@ export default function AdminUsersPage() {
   return (
     <GlassCard>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-white">Users</h2>
-        <p className="text-sm text-slate-300">Registered users derived from accounts data.</p>
+        <h2 className="text-lg font-semibold text-slate-900">Users</h2>
+        <p className="text-sm text-slate-700">Registered users derived from accounts data.</p>
       </div>
 
       <UsersTable users={users} />
 
-      {loading && <p className="mt-3 text-sm text-cyan-100">Loading users...</p>}
-      {error && <p className="mt-3 text-sm text-rose-200">{error}</p>}
+      {loading && <p className="mt-3 text-sm text-slate-700">Loading users...</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
     </GlassCard>
   );
 }

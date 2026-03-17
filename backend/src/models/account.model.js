@@ -42,6 +42,13 @@ const accountSchema = new mongoose.Schema({
         match: [/^\d{12}$/, "Aadhaar number must be exactly 12 digits"],
         index: true,
     },
+    phoneNumber: {
+        type: String,
+        required: [true, "Phone number is required"],
+        trim: true,
+        match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number (E.164 format or 10+ digits)"],
+        index: true,
+    },
 
     currency:{
         type: String,

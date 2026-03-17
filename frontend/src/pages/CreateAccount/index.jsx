@@ -6,7 +6,7 @@ import { createAccount, fetchAccounts } from '../../features/accounts/accountsSl
 
 const initialForm = {
   personalDetails: { fullName: '', email: '', nationality: '' },
-  identityDetails: { aadhaarNumber: '' },
+  identityDetails: { aadhaarNumber: '', phoneNumber: '' },
   accountDetails: { currency: 'INR', accountType: 'savings' },
   confirmation: { isConfirmed: false },
 };
@@ -22,7 +22,7 @@ export default function CreateAccountPage() {
     if (step === 1) {
       return form.personalDetails.fullName && form.personalDetails.email && form.personalDetails.nationality;
     }
-    if (step === 2) return form.identityDetails.aadhaarNumber;
+    if (step === 2) return form.identityDetails.aadhaarNumber && form.identityDetails.phoneNumber;
     if (step === 3) return form.accountDetails.accountType;
     return true;
   }, [form, step]);
@@ -103,17 +103,31 @@ export default function CreateAccountPage() {
           )}
 
           {step === 2 && (
-            <input
-              className="glass-input"
-              placeholder="Aadhaar Number"
-              value={form.identityDetails.aadhaarNumber}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  identityDetails: { aadhaarNumber: event.target.value },
-                }))
-              }
-            />
+            <>
+              <input
+                className="glass-input"
+                placeholder="Aadhaar Number"
+                value={form.identityDetails.aadhaarNumber}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    identityDetails: { ...prev.identityDetails, aadhaarNumber: event.target.value },
+                  }))
+                }
+              />
+              <input
+                className="glass-input"
+                type="tel"
+                placeholder="Phone Number"
+                value={form.identityDetails.phoneNumber}
+                onChange={(event) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    identityDetails: { ...prev.identityDetails, phoneNumber: event.target.value },
+                  }))
+                }
+              />
+            </>
           )}
 
           {step === 3 && (

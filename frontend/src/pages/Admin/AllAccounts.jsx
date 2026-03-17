@@ -38,7 +38,7 @@ export default function AllAccountsPage() {
   return (
     <GlassCard>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-white">All Accounts</h2>
+        <h2 className="text-lg font-semibold text-slate-900">All Accounts</h2>
         <div className="flex flex-wrap gap-2">
           {filters.map((filter) => (
             <button
@@ -47,8 +47,8 @@ export default function AllAccountsPage() {
               onClick={() => setActiveFilter(filter.value)}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
                 activeFilter === filter.value
-                  ? 'border-cyan-200/60 bg-cyan-500/25 text-cyan-100'
-                  : 'border-white/20 text-slate-200 hover:bg-white/10'
+                  ? 'border-blue-300 bg-blue-200/40 text-slate-900'
+                  : 'border-slate-300 text-slate-700 hover:bg-white/60'
               }`}
             >
               {filter.label}
@@ -59,9 +59,9 @@ export default function AllAccountsPage() {
 
       <AccountsTable accounts={filtered} onStatusChange={onStatusChange} showActions />
 
-      {loading && <p className="mt-3 text-sm text-cyan-100">Loading accounts...</p>}
-      {feedback && <p className="mt-3 text-sm text-cyan-100">{feedback}</p>}
-      {error && <p className="mt-3 text-sm text-rose-200">{error}</p>}
+      {loading && <p className="mt-3 text-sm text-slate-700">Loading accounts...</p>}
+      {feedback && <p className="mt-3 text-sm text-emerald-700">{feedback}</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
     </GlassCard>
   );
 }

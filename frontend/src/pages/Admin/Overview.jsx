@@ -50,14 +50,14 @@ export default function AdminOverviewPage() {
 
       <GlassCard>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Recent Accounts</h2>
-          {loading && <span className="text-xs text-cyan-100">Loading...</span>}
+          <h2 className="text-lg font-semibold text-slate-900">Recent Accounts</h2>
+          {loading && <span className="text-xs text-slate-600">Loading...</span>}
         </div>
         <AccountsTable accounts={adminAccounts.slice(0, 10)} onStatusChange={handleStatusChange} showActions />
       </GlassCard>
 
-      {feedback && <p className="text-sm text-cyan-100">{feedback}</p>}
-      {error && <p className="text-sm text-rose-200">{error}</p>}
+      {feedback && <p className="text-sm text-emerald-700">{feedback}</p>}
+      {error && <p className="text-sm text-red-700">{error}</p>}
     </div>
   );
 }

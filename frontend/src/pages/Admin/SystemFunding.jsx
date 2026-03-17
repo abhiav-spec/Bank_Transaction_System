@@ -35,15 +35,15 @@ export default function SystemFundingPage() {
   return (
     <GlassCard className="max-w-3xl">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-white">System Funding</h2>
-        <p className="text-sm text-slate-300">Send funds from bank system account to any user account.</p>
+        <h2 className="text-lg font-semibold text-slate-900">System Funding</h2>
+        <p className="text-sm text-slate-700">Send funds from bank system account to any user account.</p>
       </div>
 
       <FundingForm fromAccounts={systemAccounts} toAccounts={adminAccounts} onSubmit={handleFunding} loading={loading} />
 
-      {successMessage && <p className="mt-3 text-sm text-emerald-200">{successMessage}</p>}
-      {localFeedback && <p className="mt-3 text-sm text-cyan-100">{localFeedback}</p>}
-      {error && <p className="mt-3 text-sm text-rose-200">{error}</p>}
+      {successMessage && <p className="mt-3 text-sm text-emerald-700">{successMessage}</p>}
+      {localFeedback && <p className="mt-3 text-sm text-emerald-700">{localFeedback}</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
     </GlassCard>
   );
 }

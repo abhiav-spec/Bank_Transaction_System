@@ -100,8 +100,8 @@ export default function FundingForm({ fromAccounts, toAccounts, onSubmit, loadin
         </button>
       </div>
 
-      {!hasFromAccounts && <p className="text-xs text-rose-200">No system account found for this admin user.</p>}
-      {!hasToAccounts && <p className="text-xs text-amber-200">Create another user account to send funding.</p>}
+      {!hasFromAccounts && <p className="text-xs text-red-700">No system account found for this admin user.</p>}
+      {!hasToAccounts && <p className="text-xs text-amber-700">Create another user account to send funding.</p>}
     </form>
   );
 }

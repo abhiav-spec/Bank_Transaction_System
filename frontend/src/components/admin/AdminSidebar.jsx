@@ -11,8 +11,8 @@ const adminLinks = [
 
 export default function AdminSidebar({ onLogout }) {
   return (
-    <aside className="w-full rounded-2xl border border-white/15 bg-slate-900/45 p-4 backdrop-blur-xl lg:sticky lg:top-24 lg:h-fit lg:w-72">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-cyan-100/80">Bank Control Panel</p>
+    <aside className="w-full rounded-2xl border border-white/25 bg-white/15 p-4 backdrop-blur-xl lg:sticky lg:top-24 lg:h-fit lg:w-72">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-slate-700">Bank Control Panel</p>
       <nav className="space-y-2">
         {adminLinks.map((link) => (
           <NavLink
@@ -21,7 +21,7 @@ export default function AdminSidebar({ onLogout }) {
             end={link.to === '/admin'}
             className={({ isActive }) =>
               `block rounded-xl px-3 py-2.5 text-sm transition ${
-                isActive ? 'bg-cyan-300/20 text-cyan-50' : 'text-slate-200 hover:bg-white/10'
+                isActive ? 'bg-blue-300/30 text-slate-900 font-medium' : 'text-slate-700 hover:bg-white/40'
               }`
             }
           >
@@ -31,7 +31,7 @@ export default function AdminSidebar({ onLogout }) {
         <button
           type="button"
           onClick={onLogout}
-          className="block w-full rounded-xl border border-rose-200/30 px-3 py-2.5 text-left text-sm text-rose-100 transition hover:bg-rose-500/20"
+          className="block w-full rounded-xl border border-red-300/40 px-3 py-2.5 text-left text-sm text-red-700 transition hover:bg-red-300/20"
         >
           Logout
         </button>

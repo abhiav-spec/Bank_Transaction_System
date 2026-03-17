@@ -26,6 +26,7 @@ async function createAccountDetailsController(req, res) {
         const nationality = normalizeString(personalDetails.nationality);
 
         const aadhaarNumber = normalizeString(identityDetails.aadhaarNumber);
+        const phoneNumber = normalizeString(identityDetails.phoneNumber);
 
         const currency = normalizeString(accountDetails.currency || 'INR').toUpperCase();
         const accountType = normalizeString(accountDetails.accountType).toLowerCase();
@@ -42,6 +43,13 @@ async function createAccountDetailsController(req, res) {
         if (!aadhaarNumber) {
             return res.status(400).json({
                 message: "aadhaarNumber is required in identityDetails",
+                status: false,
+            });
+        }
+
+        if (!phoneNumber) {
+            return res.status(400).json({
+                message: "phoneNumber is required in identityDetails",
                 status: false,
             });
         }
@@ -109,6 +117,7 @@ async function createAccountDetailsController(req, res) {
             email,
             nationality,
             aadhaarNumber,
+            phoneNumber,
             accountType,
             currency,
         });
@@ -242,10 +251,50 @@ async function updateAccountStatusForSystemController(req, res) {
     }
 }
 
+async function searchAccountsByPhoneController(req, res) {
+    try {
+        const { phone } = req.query;
+
+        if (!phone) {
+            return res.status(400).json({
+                message: "Phone number is required as query parameter",
+                status: false,
+            });
+        }
+
+        const phoneNumber = normalizeString(phone);
+
+        const accounts = await accountModel.find({
+            phoneNumber: phoneNumber,
+            status: 'active'
+        }).select('_id fullName email accountType phoneNumber currency');
+
+        if (accounts.length === 0) {
+            return res.status(404).json({
+                message: "No active accounts found with this phone number",
+                status: false,
+                data: []
+            });
+        }
+
+        return res.status(200).json({
+            message: "Accounts found successfully",
+            status: true,
+            data: accounts,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Internal server error",
+            status: false,
+        });
+    }
+}
+
 module.exports = {
     createAccountDetailsController,
     getAccountsController,
     getAccountBalanceController,
     getAllAccountsForSystemController,
     updateAccountStatusForSystemController,
+    searchAccountsByPhoneController,
 };

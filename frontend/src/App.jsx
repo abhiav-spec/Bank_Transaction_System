@@ -85,9 +85,23 @@ function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="relative flex min-h-screen overflow-hidden flex-col">
+      {/* Same background as user layout */}
+      <div className="absolute inset-0 -z-10">
+        <img
+          src={bgWoman}
+          alt="admin dashboard background"
+          className="h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-sky-900/55 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-400/20 via-cyan-300/10 to-sky-600/20" />
+      </div>
+
+      {/* Fixed navbar */}
       <AdminNavbar />
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 pb-6 pt-6 md:px-6 lg:flex-row">
+
+      {/* Main content area */}
+      <div className="flex-1 mx-auto flex max-w-7xl w-full flex-col gap-4 px-4 pb-6 pt-6 md:px-6 lg:flex-row">
         <AdminSidebar onLogout={handleLogout} />
         <main className="flex-1">
           <Outlet />

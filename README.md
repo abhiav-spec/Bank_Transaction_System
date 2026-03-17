@@ -1,11 +1,11 @@
-# Bank Transaction System (Full Project)
+# NEXA Bank Transaction System
 
-A full-stack banking system with:
+A full-stack digital banking system with:
 
 - **Backend:** Node.js + Express + MongoDB
 - **Frontend:** React + Redux Toolkit + React Router + Tailwind CSS + Axios + Three.js
 
-This is the **main project README** for running and understanding the complete system.
+This is the main README for running and understanding the complete NEXA Bank project.
 
 ---
 
@@ -15,6 +15,7 @@ This is the **main project README** for running and understanding the complete s
 - [Tech Stack](#tech-stack)
 - [Repository Structure](#repository-structure)
 - [Core Features](#core-features)
+- [Application Routes](#application-routes)
 - [User Roles](#user-roles)
 - [Quick Start](#quick-start)
 - [Environment Variables](#environment-variables)
@@ -27,15 +28,19 @@ This is the **main project README** for running and understanding the complete s
 
 ## Project Overview
 
-This project provides a secure digital banking workflow:
+This project provides a secure digital banking workflow for both normal users and system users.
 
-- User registration/login/logout
-- Dedicated account creation page with 4-step KYC flow (`/accounts/create`)
-- Account balance via ledger model (credit/debit)
-- User-to-user transfer with idempotency and transaction PIN
-- System-user-only initial funding endpoint
-- Forgot/reset password with secure token flow (reset token from URL, not shown in form)
-- Admin dashboard for account control and system operations
+Key capabilities include:
+
+- User registration, login, logout, and protected routes
+- Dedicated account creation page with multi-step KYC flow
+- Account balance derived from ledger credit and debit entries
+- Quick transfer flow secured with transaction PIN and idempotency key
+- Recipient lookup by phone number with account selection when multiple accounts exist
+- Selected payment card flow so transfers are made from one explicitly chosen card
+- System-user-only funding and account management operations
+- Password reset flow using secure reset token in the URL
+- Separate user dashboard and admin dashboard with a consistent light glass UI
 
 ---
 
@@ -99,8 +104,12 @@ Bank_Transaction_System/
 - **Auth UI:** modern split-screen Login/Register/Forgot/Reset pages with shared auth navbar + About modal
 - **Auth Guardrails:** Login and Register require Terms checkbox before submit
 - **Password Reset:** forgot/reset with hashed reset token + expiry
-- **Accounts:** separate account list page (`/accounts`) and dedicated create page (`/accounts/create`) with 4-step KYC, Aadhaar validation, max-3 account rule
+- **Accounts:** separate account list page (`/accounts`) and dedicated create page (`/accounts/create`) with 4-step KYC, Aadhaar validation, phone number capture, and max-3 account rule per Aadhaar
+- **Selected Payment Card:** dedicated Select Card page (`/select-card`) with persisted single-card selection for transfers
 - **Transfers:** idempotency key + transaction PIN required
+- **Phone-Based Recipient Search:** transfer form searches recipient accounts by phone number and allows choosing the target account
+- **Dashboard UX:** live search navigation, recent transaction notifications, quick actions, and filtered card tabs
+- **UI Design:** blurred image background, glassmorphism layout, transparent navbar, light-themed sidebar, and NEXA Bank branding
 - **System Funding:** protected endpoint for system user only
 - **Admin Console:**
   - dashboard stats
@@ -109,6 +118,38 @@ Bank_Transaction_System/
   - users list
   - transactions list
   - funding form
+  - account status management
+  - same branded light-theme layout as the user dashboard
+
+---
+
+## Application Routes
+
+### Public Routes
+
+- `/login`
+- `/register`
+- `/forgot-password`
+- `/reset-password?token=...`
+
+### Normal User Routes
+
+- `/dashboard`
+- `/accounts`
+- `/accounts/create`
+- `/select-card`
+- `/transfer`
+- `/transactions`
+- `/profile`
+
+### System User Routes
+
+- `/admin`
+- `/admin/search-account`
+- `/admin/all-accounts`
+- `/admin/users`
+- `/admin/transactions`
+- `/admin/system-funding`
 
 ---
 
@@ -116,12 +157,17 @@ Bank_Transaction_System/
 
 1. **Normal User**
    - create accounts
+  - select one payment card for transfers
    - transfer funds
+  - search recipient by phone number and choose recipient account
    - view own transactions
+  - use dashboard search and notifications
 
 2. **System User (Bank Admin)**
    - access admin dashboard
    - manage account status
+  - search and review all accounts
+  - review users and transactions
    - system initial funding to user accounts
 
 ---
@@ -154,7 +200,7 @@ FRONTEND_URL=http://localhost:5173
 ### 3) Start backend
 
 ```bash
-npm --prefix backend run start
+npm --prefix backend run dev
 ```
 
 ### 4) Start frontend
@@ -180,6 +226,11 @@ Frontend uses:
 
 - `VITE_API_BASE_URL` (optional, defaults to `http://localhost:3000`)
 
+Backend account creation and transfer flow now also rely on:
+
+- account-level `phoneNumber` stored during account creation
+- phone-based recipient lookup endpoint used by the transfer UI
+
 ---
 
 ## Run the Project
@@ -192,6 +243,21 @@ Recommended startup order:
 1. backend
 2. frontend
 
+Recommended commands:
+
+```bash
+# terminal 1
+npm --prefix backend run dev
+
+# terminal 2
+npm --prefix frontend run dev
+```
+
+Notes:
+
+- Running `npm run dev` from the repository root will fail because the root does not define that script.
+- Use the package-specific commands above or run commands from inside `backend/` and `frontend/`.
+
 ---
 
 ## API + Frontend Flow
@@ -200,6 +266,10 @@ Recommended startup order:
 - JWT token is attached through Axios request interceptor
 - Admin access check is performed through system account API authorization
 - User account creation is initiated from `/accounts/create` and account listing remains on `/accounts`
+- Account creation captures identity details such as Aadhaar number and phone number
+- Transfer flow uses the selected payment card as sender account
+- Transfer UI searches recipient accounts by phone number through `GET /api/accounts/search?phone=...`
+- When multiple accounts are mapped to the same phone number, the user chooses which recipient account to send money to
 - Reset password page reads token from URL query (`/reset-password?token=...`) and does not expose token input
 - Funding API used by admin page:
   - `POST /api/transactions/system/initial-funds`
@@ -216,6 +286,24 @@ Check these first:
 - selected `fromAccount` belongs to system user
 - both accounts are `active`
 - `idempotencyKey` is unique
+
+### Transfer search by phone returns no accounts
+
+Check these first:
+
+- the recipient account was created with a phone number in account KYC
+- the phone number matches exactly what is stored on the account
+- the recipient account status is `active`
+- backend server is running and reachable on port `3000`
+
+### Transfer fails even after selecting a recipient
+
+Check these first:
+
+- a payment card is selected on `/select-card`
+- the transaction PIN is correct
+- sender account has enough balance
+- recipient account chosen from search results is the intended account
 
 ### 404 on `/api/transactions/system/all`
 

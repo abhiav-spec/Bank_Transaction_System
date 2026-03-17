@@ -15,14 +15,14 @@ export default function AdminTransactionsPage() {
   return (
     <GlassCard>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-white">Transactions</h2>
-        <p className="text-sm text-slate-300">System-wide transaction logs.</p>
+        <h2 className="text-lg font-semibold text-slate-900">Transactions</h2>
+        <p className="text-sm text-slate-700">System-wide transaction logs.</p>
       </div>
 
       <TransactionsTable transactions={adminList} />
 
-      {adminLoading && <p className="mt-3 text-sm text-cyan-100">Loading transactions...</p>}
-      {adminError && <p className="mt-3 text-sm text-rose-200">{adminError}</p>}
+      {adminLoading && <p className="mt-3 text-sm text-slate-700">Loading transactions...</p>}
+      {adminError && <p className="mt-3 text-sm text-red-700">{adminError}</p>}
     </GlassCard>
   );
 }

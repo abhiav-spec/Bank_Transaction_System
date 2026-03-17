@@ -7,9 +7,9 @@ const actions = [
 export default function AccountsTable({ accounts, onStatusChange, showActions = false }) {
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full text-left text-sm text-slate-200">
+      <table className="min-w-full text-left text-sm text-slate-700">
         <thead>
-          <tr className="border-b border-white/15 text-xs uppercase text-slate-300">
+          <tr className="border-b border-slate-300 text-xs uppercase text-slate-700">
             <th className="px-3 py-3">Account ID</th>
             <th className="px-3 py-3">User Email</th>
             <th className="px-3 py-3">Balance</th>
@@ -20,8 +20,8 @@ export default function AccountsTable({ accounts, onStatusChange, showActions = 
         </thead>
         <tbody>
           {accounts.map((account) => (
-            <tr key={account._id} className="border-b border-white/10">
-              <td className="px-3 py-3 font-mono text-xs text-cyan-100">{account._id}</td>
+            <tr key={account._id} className="border-b border-slate-200">
+              <td className="px-3 py-3 font-mono text-xs text-slate-800">{account._id}</td>
               <td className="px-3 py-3">{account.user?.email || account.email || '-'}</td>
               <td className="px-3 py-3">N/A</td>
               <td className="px-3 py-3 capitalize">{account.accountType || '-'}</td>
@@ -34,7 +34,7 @@ export default function AccountsTable({ accounts, onStatusChange, showActions = 
                         key={action.value}
                         type="button"
                         onClick={() => onStatusChange(account._id, action.value)}
-                        className="rounded border border-white/20 px-2 py-1 text-xs text-slate-100 transition hover:bg-white/10"
+                        className="rounded border border-slate-400 px-2 py-1 text-xs text-slate-700 transition hover:bg-slate-300/40"
                       >
                         {action.label}
                       </button>
@@ -46,7 +46,7 @@ export default function AccountsTable({ accounts, onStatusChange, showActions = 
           ))}
           {!accounts.length && (
             <tr>
-              <td className="px-3 py-8 text-center text-slate-300" colSpan={showActions ? 6 : 5}>
+              <td className="px-3 py-8 text-center text-slate-500" colSpan={showActions ? 6 : 5}>
                 No accounts found
               </td>
             </tr>

@@ -43,8 +43,8 @@ export default function SearchAccountPage() {
   return (
     <GlassCard>
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-white">Search Account</h2>
-        <p className="text-sm text-slate-300">Search by Account ID, User Email, or Aadhaar Number.</p>
+        <h2 className="text-lg font-semibold text-slate-900">Search Account</h2>
+        <p className="text-sm text-slate-700">Search by Account ID, User Email, or Aadhaar Number.</p>
       </div>
 
       <SearchBar searchBy={searchBy} query={query} onSearchByChange={setSearchBy} onQueryChange={setQuery} />
@@ -53,9 +53,9 @@ export default function SearchAccountPage() {
         <AccountsTable accounts={filteredAccounts} onStatusChange={onStatusChange} showActions />
       </div>
 
-      {loading && <p className="mt-3 text-sm text-cyan-100">Loading accounts...</p>}
-      {feedback && <p className="mt-3 text-sm text-cyan-100">{feedback}</p>}
-      {error && <p className="mt-3 text-sm text-rose-200">{error}</p>}
+      {loading && <p className="mt-3 text-sm text-slate-700">Loading accounts...</p>}
+      {feedback && <p className="mt-3 text-sm text-emerald-700">{feedback}</p>}
+      {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
     </GlassCard>
   );
 }
